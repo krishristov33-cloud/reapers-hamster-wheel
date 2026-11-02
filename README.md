@@ -27,3 +27,9 @@ This is a single self-contained `index.html` (~20 MB, every asset is inlined). I
 The source lives on the shared box at `/workspace/rhw/` (`tools/make_assets.py`, `tools/patch.py`, `tools/build.py`, `src/engine.js`).
 1. `python3 tools/make_assets.py` rebuilds every image from Aiko's `work/p1/layouts/RHW_{L,P}_NN_*.json` + `elements/`. All full-screen screens (02 trigger, 03 total win, 04/05/06 big/mega/epic, 01 intro) are composited per view straight from those layouts, so a pass-2 layout or element with the same name gets picked up automatically. The portrait backgrounds come from `RHW_P_00` / `RHW_P_07`. If pass 2 lands in a new folder (e.g. `work/p2/layouts`), change `LAY` at the top of the script.
 2. `python3 tools/patch.py && python3 tools/build.py` writes `dist/index.html`. The reel window / frame fit and the hamster boxes are at the top of the layout section in `patch.py` (WX0..WY1, hamL, hamP). The splash text boxes (counter on the plaque) are `L/P amount` and `counter` there too.
+
+
+## Update: UI2 + Aiko pass 2
+- I removed the Levee Jaw UI: the jackpot bars, the tournament button, Buy Bonus, the UI sheet, the spin sprites, the START/COLLECT plates and the footer bar art.
+- I replaced it with a minimal CSS HUD in the toxic style: BALANCE/BET/WIN panels, a glowing SPIN button that turns into a STOP square, AUTO/TURBO/BET/menu/info/music/FX buttons, and START/COLLECT pills.
+- LAY now points to work/p2/layouts. In portrait the reels are lower and wider, and the hamster, wheel and HUD have been moved to fit. Win amounts have a glow halo because the boards are gone. The Potion sprite is now Sym_Potion_v2.

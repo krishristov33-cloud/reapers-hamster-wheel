@@ -33,7 +33,7 @@ sx, sy = (WX1 - WX0) / 895, (WY1 - WY0) / 684
 RF = [round(WX0 - 128 * sx, 1), round(WY0 - 100 * sy, 1)]; RF += [round(RF[0] + 1152 * sx, 1), round(RF[1] + 864 * sy, 1)]
 HW, HH = meta['hamster']
 hamL = [-30, 440, -30 + round(500 * HW / HH), 940]
-hamP = [60, 250, 60 + round(560 * HW / HH), 810]
+hamP = [540 - round(260 * HW / HH), 266, 540 + round(260 * HW / HH), 786]   # p2: centred above the lower, wider reels
 m = re.search(r'const LAYOUT = (\[.*?\])\[0\] \|\| null;', s, flags=re.S)
 L = json.loads(m.group(1))[0]
 L['cells'] = {'x': cx, 'y': cy, 'cx': [round((a + b) / 2, 1) for a, b in cx], 'cy': [round((a + b) / 2, 1) for a, b in cy]}
@@ -47,7 +47,8 @@ V = L['views']
 V['landscape']['croc'] = {'box': hamL, 'front': True}
 V['landscape']['logo'] = [770, -14, 0.5]
 V['portrait']['croc'] = {'box': hamP, 'front': False}
-V['portrait']['logo'] = [369, 92, 0.45]
+V['portrait']['logo'] = [274, 53, 0.7]
+V['portrait']['board'] = [-513.8, 785.5, 1.1]   # p2 portrait reel window ~[35,906]-[1045,1699]
 s = s[:m.start(1)] + json.dumps([L], separators=(',', ':')) + s[m.end(1):]
 
 # ---------------------------------------------------------------- SKIN data
@@ -69,10 +70,10 @@ rep("      L: { frame: [278, 106, 1402, 773], congrats: [648, 268, 634, 441], co
 rep("      P: { frame: [169.6, 400.4, 741.4, 1063.5], congrats: [280.3, 670.9, 521.7, 363.9], count: [460.2, 839.8, 156, 119.3], start: [362.9, 1065, 351.6, 128.4] },",
     f"      P: {{ frame: {fs('fs-frame-p')}, congrats: {fs('fs-congrats-p')}, count: {fs('fs-count-p')}, start: [362.9, 1640, 351.6, 128.4] }},")
 rep("      L: { amount: [380, 466, 1160, 158], title: [548, 626, 834, 92] },\n      P: { amount: [222, 834, 636, 130], title: [200, 966, 680, 76] },",
-    f"      L: {{ amount: [675, 912, 599, 84], title: {fs('tw-title-l')}, frame: {fs('tw-frame-l')} }},\n"
-    f"      P: {{ amount: [268, 1340, 572, 80], title: {fs('tw-title-p')}, frame: {fs('tw-frame-p')} }},")
+    f"      L: {{ amount: [410, 800, 1100, 130], title: {fs('tw-title-l')}, frame: {fs('tw-frame-l')} }},\n"
+    f"      P: {{ amount: [40, 1225, 1000, 130], title: {fs('tw-title-p')}, frame: {fs('tw-frame-p')} }},")
 rep("      big: 15, mega: 50,\n      L: { big: [556.5, 145, 807, 655], mega: [579.5, 54, 761, 746], counter: [210, 812, 1500, 130] },\n      P: { big: [96.2, 499.5, 887.7, 720.5], mega: [101.7, 360.3, 876.6, 859.7], counter: [30, 1224, 1020, 120] },",
-    "      big: 15, mega: 50, epic: 100,\n      L: { big: [0, 0, 1920, 1072], mega: [0, 0, 1920, 1072], counter: [675, 912, 599, 84] },\n      P: { big: [0, 0, 1080, 1920], mega: [0, 0, 1080, 1920], counter: [268, 1340, 572, 80] },")
+    "      big: 15, mega: 50, epic: 100,\n      L: { big: [0, 0, 1920, 1072], mega: [0, 0, 1920, 1072], counter: [410, 838, 1100, 130] },\n      P: { big: [0, 0, 1080, 1920], mega: [0, 0, 1080, 1920], counter: [40, 1268, 1000, 130] },")
 rep("frameBox: [277.1, 53.9, 1641.1, 973.1], fade: 500 },", f"frameBox: {RF}, fade: 500 }},")
 rep("  qa: { x: 1300, y: 150 },", "  qa: { x: 1300, y: 150 },\n  // RHW: the wheel of doom (PLACEHOLDER art: static body, the page lights one notch per scatter)\n  wheel: { notches: 8 },")
 # asset map: drop LEVEE JAW-only art, add RHW pieces (build.py maps key -> assets/<name> or its .webp twin)
@@ -143,7 +144,7 @@ rep("  #logo{position:absolute;pointer-events:none}",
 """  #logo{position:absolute;pointer-events:none}
   /* RHW: wheel of doom (left of the reels in landscape, top right in portrait) */
   #wheel{position:absolute;left:28px;top:96px;width:262px;height:317px;pointer-events:none;z-index:3;transition:opacity .4s}
-  html.portrait #wheel{left:800px;top:250px;width:240px;height:290px}
+  html.portrait #wheel{left:779px;top:445px;width:273px;height:330px}
   #wheel.fs{opacity:0}
   #wheelBody{position:absolute;inset:0;width:100%;height:100%;transform-origin:49% 40%}
   #wheelSkull{position:absolute;left:39.2%;top:35.6%;width:19%;height:29.2%;transform-origin:50% 20%}
@@ -325,3 +326,87 @@ rep("  d.textContent = 'LEVEE JAW DEBUG  (G hides)\\n'", "  d.textContent = 'RHW
 rep("  const line = '[LJ] ' + msg;", "  const line = '[RHW] ' + msg;")
 open(OUT, 'w', encoding='utf-8').write(s)
 print('ok', len(s))
+
+# ================================================================ UI2 (t103u): minimal toxic-swamp HUD, no LEVEE JAW chrome
+m = re.search(r'const LAYOUT = (\[.*?\])\[0\] \|\| null;', s, flags=re.S)
+L = json.loads(m.group(1))[0]; V = L['views']
+GONE = ['uSpade', 'uHeart', 'uDiamond', 'uClub', 'bTournament', 'bBuy1', 'uFooter', 'uBalance', 'uBalEur', 'uLastWin',
+        'uWinEur', 'uWinShort', 'uBetPill']
+V['landscape']['hide'] = GONE[:]
+V['landscape']['ui'] = {'bAuto': [1714, 236, 0.75], 'bSpin': [1660, 360, 1.1], 'bTurbo': [1702, 616, 1],
+  'bCoins': [1714, 690, 0.75], 'bHome': [22, 972, 0.85], 'bFull': [100, 972, 0.85], 'bMinus': [802, 966, 0.85],
+  'bBetBar': [884, 955, 1], 'bPlus': [1046, 966, 0.85], 'bMusic': [1700, 972, 0.85], 'bSound': [1772, 972, 0.85],
+  'bMenu': [1844, 972, 0.85]}
+V['portrait']['hide'] = sorted(set(V['portrait'].get('hide', []) + GONE) - {'uLastWin'} | {'uLastWin', 'bFull', 'bMusic', 'bSound'})
+pu = V['portrait']['ui']
+for k in GONE: pu.pop(k, None)
+pu.update({'bMinus': [346, 1840, 0.8], 'bBetBar': [462, 1824, 1], 'bPlus': [672, 1840, 0.8], 'bSpin': [62, 420, 1.0],
+  'bAuto': [40, 650, 0.8], 'bTurbo': [160, 674, 1], 'bHome': [22, 296, 0.8], 'bMenu': [106, 296, 0.8], 'bCoins': [190, 296, 0.8]})
+pt = V['portrait'].setdefault('text', {})
+pt['balance'] = {'x': 30, 'y': 1852, 'w': 290, 'h': 40, 'size': 44}
+pt['lastWin'] = {'x': 760, 'y': 1852, 'w': 290, 'h': 40, 'size': 44}
+pt['bet'] = {'x': 462, 'y': 1852, 'w': 155, 'h': 40, 'size': 44}
+pt['prompt'] = {'x': 260, 'y': 1793, 'h': 21}
+pt['footer'] = {k: {'x': 0, 'y': 1990, 'w': 10, 'h': 10, 'size': 10} for k in ['totalBet', 'sessionId', 'rtp', 'chance', 'totalWin', 'clock']}
+lt = V['landscape'].setdefault('text', {})
+lt['balance'] = {'x': 210, 'y': 990, 'w': 330, 'h': 30, 'size': 40}
+lt['lastWin'] = {'x': 1360, 'y': 990, 'w': 300, 'h': 30, 'size': 40}
+lt['bet'] = {'x': 884, 'y': 990, 'w': 155, 'h': 32, 'size': 44}
+s = s[:m.start(1)] + json.dumps([L], separators=(',', ':')) + s[m.end(1):]
+# button glyphs (CSS ::after reads data-ic)
+for bid, ic in [('bAuto', 'AUTO'), ('bTurbo', 'TURBO'), ('bCoins', 'BET'), ('bHome', 'i'), ('bFull', '⤢'), ('bMinus', '−'),
+                ('bPlus', '+'), ('bMusic', '♪'), ('bSound', 'FX'), ('bMenu', '≡'), ('bSpin', 'SPIN')]:
+    rep(f'<div id="{bid}" ', f'<div data-ic="{ic}" id="{bid}" ')
+rep('  <svg id="txt" viewBox="0 0 1920 1072">',
+    '  <div id="hBar"></div><div id="hBal" class="hpanel"><span>BALANCE</span></div><div id="hBet" class="hpanel"><span>BET</span></div><div id="hWin" class="hpanel"><span>WIN</span></div>\n  <svg id="txt" viewBox="0 0 1920 1072">')
+rep("/* SKIN:END css */</style>", r"""  /* ===== RHW UI2: temporary minimal HUD (CSS only; no LEVEE JAW sheet) ===== */
+  :root{--tox:#7CFF3A}
+  #hBar{position:absolute;left:0;top:944px;width:1920px;height:128px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(4,10,3,.35),rgba(4,10,3,.88) 30%);border-top:2px solid rgba(124,255,58,.45);box-shadow:0 -6px 24px rgba(124,255,58,.15)}
+  html.portrait #hBar{top:1786px;width:1080px;height:134px}
+  .hpanel{position:absolute;pointer-events:none;border-radius:16px;background:rgba(8,18,6,.72);border:2px solid rgba(124,255,58,.6);
+    box-shadow:0 0 14px rgba(124,255,58,.25),inset 0 0 18px rgba(124,255,58,.08)}
+  .hpanel span{position:absolute;left:0;right:0;top:7px;text-align:center;font:800 17px/1 SPRoboto,Roboto,Arial,sans-serif;letter-spacing:.18em;color:#9de86a}
+  #hBal{left:200px;top:954px;width:350px;height:80px} #hWin{left:1350px;top:954px;width:320px;height:80px} #hBet{left:880px;top:954px;width:163px;height:80px}
+  html.portrait #hBal{left:20px;top:1822px;width:310px;height:88px} html.portrait #hWin{left:750px;top:1822px;width:310px;height:88px}
+  html.portrait #hBet{left:430px;top:1822px;width:220px;height:88px}
+  html.portrait .hpanel span{font-size:17px;top:7px}
+  .money,.bet{fill:#eaffd8 !important} .prompt{fill:#b9e89a} .prompt.gold{fill:#c8ff7a}
+  .btn{background:none !important}
+  .btn.round,#bTurbo{background:radial-gradient(circle at 50% 38%,rgba(46,84,26,.92),rgba(6,14,4,.94) 70%) !important;border:3px solid var(--tox);
+    box-shadow:0 0 12px rgba(124,255,58,.5),inset 0 0 14px rgba(124,255,58,.22)}
+  .btn::after{content:attr(data-ic);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
+    font:900 30px/1 SPRoboto,Roboto,Arial,sans-serif;color:#e4ffcc;text-shadow:0 0 10px var(--tox);letter-spacing:.04em}
+  #bMinus::after,#bPlus::after{font-size:52px} #bHome::after{font-style:italic;font-family:Georgia,serif;font-size:40px}
+  #bMenu::after{font-size:48px} #bTurbo::after{font-size:22px} #bAuto::after,#bCoins::after{font-size:28px}
+  #bTurbo.on,#bAuto.on{background:radial-gradient(circle at 50% 38%,#8dff4a,#2c7a10 75%) !important}
+  #bTurbo.on::after,#bAuto.on::after{color:#06200a;text-shadow:none}
+  #bBetBar{border:0 !important;box-shadow:none !important}
+  #bSpin{border-width:5px;background:radial-gradient(circle at 50% 35%,#b6ff6e 0%,#58d41c 38%,#1d5a08 72%,#0a2104 100%) !important;
+    box-shadow:0 0 30px 8px rgba(124,255,58,.55),0 0 70px 16px rgba(124,255,58,.22),inset 0 -10px 24px rgba(0,0,0,.45);animation:spinGlow 1.8s ease-in-out infinite}
+  @keyframes spinGlow{50%{box-shadow:0 0 42px 12px rgba(124,255,58,.75),0 0 90px 22px rgba(124,255,58,.3),inset 0 -10px 24px rgba(0,0,0,.45)}}
+  #bSpin::after{font-size:46px;color:#062006;text-shadow:0 1px 0 rgba(255,255,255,.5);letter-spacing:.08em}
+  #bSpin.stop::after{content:''}
+  #spinPatch,#spinArrows{display:none !important}
+  #spinStop{background:none !important} #spinStop::before{background:#062006 !important;box-shadow:none !important}
+  .ring.green,.ring.turbo{box-shadow:0 0 0 4px #c8ff7a,0 0 22px 6px rgba(124,255,58,.8) !important}
+  .slash{background:#ff5a3a !important}
+  #fsPanel{background:rgba(8,18,6,.85) !important;border:3px solid var(--tox) !important;box-shadow:0 0 22px rgba(124,255,58,.45) !important}
+  #fsPanel .lb{background:linear-gradient(180deg,#5bd21c,#215e08) !important;border:2px solid #c8ff7a !important;text-shadow:0 2px 0 #0a2a04 !important}
+  #fsPanel .v{color:#d8ffb0 !important;text-shadow:0 0 16px rgba(124,255,58,.7) !important} #fsPanel .v small{color:#9de86a !important}
+  /* START / COLLECT: a glowing toxic pill */
+  #splash .sp-start{border-radius:999px;background:radial-gradient(circle at 50% 35%,#b6ff6e,#4cc014 45%,#164a06 100%);border:4px solid #dcffb0;
+    box-shadow:0 0 30px 8px rgba(124,255,58,.6)}
+  #splash .sp-start > img,#splash .sp-start .sp-shine{display:none}
+  #splash .sp-start .sp-label{color:#062006 !important;-webkit-text-stroke:0 !important;padding-bottom:0;display:flex;align-items:center;justify-content:center;
+    font:900 64px/1 SPRoboto,Roboto,Arial,sans-serif !important;letter-spacing:.08em;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+  html.portrait #splash .sp-start .sp-label{font-size:58px !important}
+  #splash .sp-counter,#splash .sp-amount{filter:drop-shadow(0 0 10px rgba(0,0,0,.95)) drop-shadow(0 0 26px rgba(10,40,0,.9)) drop-shadow(0 0 18px rgba(124,255,58,.45))}
+/* SKIN:END css */</style>""")
+rep("  si.setAttribute('role', 'button'); si.setAttribute('aria-label', 'Start the free spins');",
+    "  { const lb = document.createElement('div'); lb.className = 'sp-text sp-label'; lb.textContent = 'START'; si.appendChild(lb); }\n  si.setAttribute('role', 'button'); si.setAttribute('aria-label', 'Start the free spins');")
+rep("  fsPanel: { L: [22, 106, 262, 150], P: [26, 232, 236, 150] },", "  fsPanel: { L: [22, 106, 262, 150], P: [785, 470, 262, 150] },")
+rep("const buyMsg = () => {", "const buyMsg_unused = () => {")
+rep("document.querySelectorAll('.btn.buy').forEach((b) => b.addEventListener('click', buyMsg));", "")
+open(OUT, 'w', encoding='utf-8').write(s)
+print('ui2 ok', len(s))

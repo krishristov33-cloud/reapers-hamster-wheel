@@ -4,7 +4,7 @@
 import json, os, struct, glob, shutil
 from PIL import Image
 ROOT = '/workspace/aiko/projects/ReapersHamsterWheel'
-LAY = ROOT + '/work/p1/layouts'
+LAY = ROOT + '/work/p2/layouts'      # pass 2 (2026-11-03)
 OUT = '/workspace/rhw/assets'
 LJ = '/workspace/rhw/assets_lj'
 os.makedirs(OUT, exist_ok=True)
@@ -66,7 +66,7 @@ save(fsf, 'reelframe-fs.webp', 85)
 lg = A('elements/shared/Logo_BaseGame.png'); lg.thumbnail((760, 400)); save(lg, 'logo.webp', 88)
 
 # 4) symbols: 400x400 canvas, art fitted into FIT px, centred (LJ sprite contract)
-SYM = {'J': 'Sym_J', 'Q': 'Sym_Q', 'K': 'Sym_K', 'A': 'Sym_A', 'KEY': 'Sym_Cross', 'STUD': 'Sym_Potion',
+SYM = {'J': 'Sym_J', 'Q': 'Sym_Q', 'K': 'Sym_K', 'A': 'Sym_A', 'KEY': 'Sym_Cross', 'STUD': 'Sym_Potion_v2',
        'BANDANA': 'Sym_Spellbook', 'RING': 'Sym_Lantern', 'BLADE': 'Sym_CrocSkull', 'BOTTLE': 'Sym_Scythe',
        'W': 'Sym_WILD', 'CROWN': 'Sym_SCATTER', 'XW': 'Sym_WILD'}
 FIT = {'W': 330, 'CROWN': 330}
@@ -96,28 +96,29 @@ def screen(nn, keep, tag, crop=False):
             b = im.getbbox(); im = im.crop(b); box = [b[0], b[1], b[2] - b[0], b[3] - b[1]]
         BOX[f'{tag}-{v}'] = box
         save(im, f'splash-{tag}-{v}.webp', 78)
-COUNT = lambda l: l['group'] == 'Sign_10FreeSpins' and l['name'] in ('Counter_Text_10FreeSpins', 'Counter_Glow')
+COUNT = lambda l: l['group'] in ('Sign_10FreeSpins', 'FS_Counter')
 TITLE = lambda l: l['group'] == 'Title'
 # REAP SPINS trigger: frame = everything but the title + "10 FREE SPINS" text; congrats = title; count = the text
 screen('02', lambda l: NOT_UNDER(l) and not TITLE(l) and not COUNT(l), 'fs-frame')
 screen('02', TITLE, 'fs-congrats', True)
 screen('02', COUNT, 'fs-count', True)
 # REAP SPINS total win: frame = all but the title text; title = TOTAL WIN text
-screen('03', lambda l: NOT_UNDER(l) and l['name'] not in ('Title_Text', 'Title_Glow'), 'tw-frame')
-screen('03', lambda l: l['name'] in ('Title_Text', 'Title_Glow'), 'tw-title', True)
+screen('03', lambda l: NOT_UNDER(l) and l['group'] != 'Title', 'tw-frame')
+screen('03', TITLE, 'tw-title', True)
 screen('04', NOT_UNDER, 'bigwin')
 screen('05', NOT_UNDER, 'megawin')
 screen('06', NOT_UNDER, 'epicwin')
 # intro: the whole screen (its own background)
 screen('01', lambda l: True, 'intro')
 
+SKIP_HAMSTER = True
 # 7) the hamster idle — SUPERSEDED: Animoto's game_pack_v1 lj_dropin bin is copied over this output (see README)
 # 7) the hamster idle (LJ croc player: CRC1 = 2 loops of webp frames), common crop over both loops
 SEQ = ROOT + '/animations/sequences'
-seqs = ['01_idle', '05_smug_cheer']
+seqs = [] if SKIP_HAMSTER else ['01_idle', '05_smug_cheer']
 metas = [json.load(open(f'{SEQ}/{s}/{s}.json')) for s in seqs]
-bx0 = min(m['cropOffset'][0] for m in metas); by0 = min(m['cropOffset'][1] for m in metas)
-bx1 = max(m['cropOffset'][0] + m['width'] for m in metas); by1 = max(m['cropOffset'][1] + m['height'] for m in metas)
+bx0 = 0 if not seqs else min(m['cropOffset'][0] for m in metas); by0 = 0 if not seqs else min(m['cropOffset'][1] for m in metas)
+bx1 = 1 if not seqs else max(m['cropOffset'][0] + m['width'] for m in metas); by1 = 1 if not seqs else max(m['cropOffset'][1] + m['height'] for m in metas)
 TH = 460; k = TH / (by1 - by0); TW = round((bx1 - bx0) * k)
 blob = b''; head = b'CRC1' + struct.pack('<I', len(seqs)); tables = b''
 STEP = 2                                           # every 2nd frame (12 fps) keeps the file light
@@ -131,13 +132,12 @@ for s, m in zip(seqs, metas):
         lens.append(len(data)); blob += data
         if s == seqs[0] and i == 0: c.save(OUT + '/croc-still.webp', 'WEBP', quality=85)
     tables += struct.pack('<II', int(m['fps'] / STEP * 1000), len(lens)) + b''.join(struct.pack('<I', x) for x in lens)
-open(OUT + '/croc-idle.bin', 'wb').write(head + tables + blob)
+if seqs: open(OUT + '/croc-idle.bin', 'wb').write(head + tables + blob)
 print('croc-idle.bin', TW, TH, os.path.getsize(OUT + '/croc-idle.bin') // 1024, 'KB')
 json.dump({'hamster': [TW, TH], 'boxes': BOX}, open(OUT + '/meta.json', 'w'))
 
 # 8) kept from LEVEE JAW (UI chrome, font, music, spin button pieces, START plate)
-for f in ['ui-sheet.webp', 'roboto.woff2', 'theme.mp3', 'spin-patch.png', 'spin-arrows.png', 'spin-blank.png',
-          'splash-fs-start-l.webp', 'splash-fs-start-p.webp', 'splash-fs-button-l.webp', 'splash-fs-button-p.webp']:
+for f in ['roboto.woff2', 'theme.mp3']:            # UI2: no LEVEE JAW UI sheet / spin / START plates any more
     shutil.copy(f'{LJ}/{f}', f'{OUT}/{f}')
 
 # Animoto game pack v1 drop-in (overrides step 7)
