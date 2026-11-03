@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><title>RHW QA</title>
+<style>
+body{margin:0;background:#0b120b;color:#cfe;font:14px system-ui;display:flex;height:100vh}
+#side{width:250px;padding:14px;box-sizing:border-box;border-right:1px solid #2a4a2a;overflow:auto}
+h1{font-size:16px;color:#7CFF3A;margin:0 0 10px}h2{font-size:12px;color:#8a8;margin:14px 0 6px;text-transform:uppercase}
+button{display:block;width:100%;margin:4px 0;padding:8px;background:#132613;color:#dfd;border:1px solid #3d7a2a;border-radius:6px;cursor:pointer}
+button:hover{background:#1d3b1d;box-shadow:0 0 8px #7CFF3A55}
+#log{font:11px monospace;color:#9b9;white-space:pre-wrap;margin-top:10px;max-height:200px;overflow:auto}
+#stage{flex:1;display:flex;align-items:center;justify-content:center;background:#050805}
+iframe{border:1px solid #2a4a2a;background:#000}
+</style></head><body>
+<div id="side"><h1>Reaper's Hamster Wheel QA</h1>
+<h2>View</h2>
+<button onclick="size(1280,720)">Landscape 1280x720</button>
+<button onclick="size(1920,1080)">Landscape 1920x1080</button>
+<button onclick="size(432,768)">Portrait 432x768</button>
+<button onclick="size(540,960)">Portrait 540x960</button>
+<button onclick="load('?nointro')">Reload (skip intro)</button>
+<button onclick="load('')">Reload with intro</button>
+<h2>Force</h2>
+<button onclick="dbg('spin')">Spin</button>
+<button onclick="dbg('forceReap')">Force REAP SPINS (next spin)</button>
+<button onclick="load('?nointro&force=reap')">Reload straight into REAP SPINS</button>
+<button onclick="dbg('forceFeature')">Force feature (engine)</button>
+<button onclick="dbg('forceXW',1)">Force expanding Wild, reel 2</button>
+<button onclick="dbg('forceXW',[1,3])">Force expanding Wild, reels 2+4</button>
+<div id="log"></div></div>
+<div id="stage"><iframe id="g" allow="autoplay; fullscreen"></iframe></div>
+<script>
+const g=document.getElementById('g'),L=document.getElementById('log');let W=1280,H=720,q='?nointro';
+function log(s){L.textContent=new Date().toLocaleTimeString()+' '+s+'\n'+L.textContent}
+function fit(){const st=document.getElementById('stage'),k=Math.min(1,(st.clientWidth-20)/W,(st.clientHeight-20)/H);g.style.width=W+'px';g.style.height=H+'px';g.style.transform='scale('+k+')'}
+function size(w,h){W=w;H=h;fit();log('view '+w+'x'+h)}
+function load(p){q=p;g.src='index.html'+p;log('load '+(p||'(intro)'))}
+function dbg(f,a){try{const d=g.contentWindow.SP_DEBUG;if(!d||!d[f])return log('SP_DEBUG.'+f+' not available yet');const r=a===undefined?d[f]():d[f](a);log(f+(a!==undefined?'('+JSON.stringify(a)+')':'')+' ok'+(r!==undefined?' -> '+r:''))}catch(e){log(f+' error: '+e.message)}}
+addEventListener('resize',fit);size(1280,720);load('?nointro');
+</script></body></html>
