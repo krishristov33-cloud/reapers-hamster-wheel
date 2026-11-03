@@ -44,15 +44,19 @@
   const L = [], el = () => { let d = document.getElementById('dbgov'); if (!d && document.body) { d = document.createElement('div'); d.id = 'dbgov';
     d.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;font:12px/1.3 monospace;color:#ff3b3b;background:rgba(0,0,0,.72);padding:4px 6px;white-space:pre-wrap;pointer-events:none;display:none';
     document.body.appendChild(d); } return d; };
-  const show = (m) => { L.push(m); if (L.length > 8) L.shift(); const d = el(); if (d) { d.textContent = L.join('\n'); d.style.display = 'block'; } };
+  const show = (m) => { try { localStorage.setItem('rhw_m_err', m); } catch (e) {} L.push(m); if (L.length > 8) L.shift(); const d = el(); if (d) { d.textContent = L.join('\n'); d.style.display = 'block'; } };
   window.RHW_ERR = show;
   window.addEventListener('error', (e) => show('ERR ' + (e.message || e.type) + (e.filename ? ' @' + String(e.filename).split('/').pop() + ':' + e.lineno : '')), true);
   window.addEventListener('unhandledrejection', (e) => { const r = e.reason; show('REJECT ' + (r && (r.name + ': ' + r.message) || String(r))); });
   const stg = (t) => { let d = document.getElementById('ldst'); if (!d && document.body) { d = document.createElement('div'); d.id = 'ldst';
       d.style.cssText = 'position:fixed;left:6px;bottom:4px;z-index:99998;font:11px monospace;color:#9f9;background:rgba(0,0,0,.55);padding:2px 5px;pointer-events:none';
       document.body.appendChild(d); }
-    if (d) d.textContent = t; return d; };
+    if (d) d.textContent = t; if (window.RHW_CRUMB) { window.RHW_CRUMB(t); window.RHW_LASTST(t); } return d; };
   window.RHW_STAGE = stg;
+  const T0 = Date.now(), Q = location.search, has = (f) => new RegExp('[?&]' + f + '(?:[=&#]|$)').test(Q);
+  const crumb = (t) => { try { localStorage.setItem('rhw_m_last', new Date().toTimeString().slice(0, 8) + ' ' + Q + ' +' + ((Date.now() - T0) / 1000).toFixed(1) + 's ' + t); } catch (e) {} };
+  window.RHW_CRUMB = crumb; crumb('head'); let lastSt = 'head'; window.RHW_LASTST = (t) => { lastSt = t; }; setInterval(() => crumb('alive, stage: ' + lastSt), 1000);
+  if (has('nofx')) document.write('<style>*,*::before,*::after{filter:none!important;-webkit-filter:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;will-change:auto!important;mix-blend-mode:normal!important;-webkit-mask-image:none!important;mask-image:none!important;box-shadow:none!important;animation:none!important}</style>');
   document.addEventListener('DOMContentLoaded', () => stg('parsing done'));
   const MEM = /[?&]mem\b/.test(location.search);
   window.RHW_MEM = () => {                     // estimated decoded bytes: <img>s + CSS backgrounds in the DOM + canvases + hamster frames
@@ -65,7 +69,7 @@
     return { imagesMB: mb(img), canvasMB: mb(cvs), hamFramesMB: mb(ham), totalMB: mb(img + cvs + ham), images: Object.keys(seen).length };
   };
   window.addEventListener('load', () => {
-    const keys = (window.RHW_BOOT || []); let n = 0; stg('decoding 0/' + keys.length + ' images');
+    const keys = (window.RHW_BOOT || []).filter((u) => !(has('noanim') && u.indexOf('m/anim-') === 0)); let n = 0; stg('decoding 0/' + keys.length + ' images');
     const done = () => { stg('ready'); if (!MEM) setTimeout(() => { const d = document.getElementById('ldst'); if (d) d.remove(); }, 2500); };
     if (!keys.length) return done();
     keys.forEach((u) => { const im = new Image(); im.src = u; (im.decode ? im.decode() : Promise.resolve()).catch(() => {}).then(() => { n++; stg('decoding ' + n + '/' + keys.length + ' images'); if (n === keys.length) done(); }); });
@@ -1156,7 +1160,7 @@ const shake = (() => {
   /* RHW t111u: the default idle is CODE-driven (breathing / squash / bob / tilt on the still, anchored at the feet); every 15 s
      one of Animoto's clips plays once (in order, cycling), then back to the code idle. All clips share the still's canvas,
      so the feet and the visible body stay put when they switch (t112u: the view boxes centre the visible body). */
-  const cv = document.getElementById('croc'); if (!cv) return;
+  const cv = document.getElementById('croc'); if (!cv || /[?&]noham(?:[=&#]|$)/.test(location.search)) return;
   const M = {"W": 1080, "H": 1040, "k": 0.5, "still": {"box": [326, 213, 464, 622], "cx": 560.0, "top": 255, "feet": [511, 824]}, "clips": [{"f": "ham-02.bin", "name": "02_scythe_twirl", "box": [158, 76, 726.0, 780.0], "fps": 24.0, "n": 95}, {"f": "ham-03.bin", "name": "03_spirit_summon", "box": [0, 0, 1080, 1040], "fps": 24.0, "n": 95}, {"f": "ham-04.bin", "name": "04_happy_dance", "box": [332, 188, 472.0, 646.0], "fps": 24.0, "n": 95}, {"f": "ham-05.bin", "name": "05_smug_cheer", "box": [326, 222, 464.0, 612.0], "fps": 24.0, "n": 95}, {"f": "ham-06.bin", "name": "06_coin_catch", "box": [340, 0, 496.0, 834.0], "fps": 24.0, "n": 95}, {"f": "ham-07.bin", "name": "07_spooky_boo", "box": [276, 205, 600.0, 629.0], "fps": 24.0, "n": 95}, {"f": "ham-08.bin", "name": "08_unhinged_leap", "box": [122, 0, 708.0, 847.0], "fps": 24.0, "n": 95}, {"f": "ham-09.bin", "name": "09_unhinged_spin", "box": [26, 233, 1019.0, 601.0], "fps": 24.0, "n": 95}]};
   let K = M.k; const IDLE_MS = 15000, g2 = cv.getContext('2d');
   const fitK = () => { const r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
@@ -1349,6 +1353,7 @@ const VIEW = (() => {
 /* SKIN:END js */
 function asset(name) {
   const v = ASSET[name];
+  if (name === 'theme.mp3' && /[?&]nomusic(?:[=&#]|$)/.test(location.search)) return '';
   return (typeof v === 'string' && (v.indexOf('data:') === 0 || v.indexOf('m/') === 0)) ? v : '';   // only inlined data: URIs, else 'missing'
 }
 /* the ONE place an image source is set (build.mjs bans every other .src assignment) */
@@ -2588,7 +2593,7 @@ const SA_META = {
 const SA = (() => {
   const FPS = 30, act = new Map();   // t111u: the source rate (no decimation); frame = elapsed ms * 30 / 1000
   let raf = 0;
-  const has = (k) => !CALM_FX() && !!(SA_META[k] && SA_META[k].u);
+  const has = (k) => !CALM_FX() && !/[?&]noanim(?:[=&#]|$)/.test(location.search) && !!(SA_META[k] && SA_META[k].u);
   function frame(p, i) {
     const m = p.m, rows = Math.ceil(m.n / m.c), c = i % m.c, r = (i / m.c) | 0;
     p.el.style.backgroundPosition = `${(c * 100) / (m.c - 1)}% ${rows > 1 ? (r * 100) / (rows - 1) : 0}%`;

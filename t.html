@@ -1,0 +1,69 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob: 'self'; font-src data: 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; media-src data: blob: 'self'; connect-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'none'">
+<title>RHW iPhone test</title>
+<style>body{margin:0;background:#061006;color:#cfe;font:15px -apple-system,system-ui;padding:10px}
+button,a.b{display:block;width:100%;box-sizing:border-box;margin:7px 0;padding:14px;font-size:18px;border-radius:12px;border:0;background:#2f6b1f;color:#fff;text-align:left;text-decoration:none}
+a.b{background:#3b3b7a}#log{white-space:pre-wrap;font:12px/1.35 ui-monospace,monospace;background:#000;padding:8px;border-radius:8px;min-height:80px}
+#prev{white-space:pre-wrap;font:12px/1.35 ui-monospace,monospace;background:#300;color:#fbb;padding:8px;border-radius:8px}
+iframe{width:100%;height:560px;border:1px solid #555}</style></head><body>
+<b>RHW iPhone crash test</b> — tap A, then B, C, D, E, F in order. If the page crashes, reopen this page: the red box shows the last step reached. Screenshot it.
+<div id="prev"></div>
+<button onclick="run('a')">A · page + CSP only</button>
+<button onclick="run('b')">B · load every image file (one by one)</button>
+<button onclick="run('c')">C · decode every image (keep all decoded)</button>
+<button onclick="run('d')">D · hamster canvas + clip files + frame decode</button>
+<button onclick="run('e')">E · music (audio element, plays)</button>
+<button onclick="run('f')">F · the real game in a frame</button>
+<b>Game with parts switched off (tap one, then come back):</b>
+<a class="b" href="mobile.html?nointro&noham&noanim&nomusic&nofx">1 · everything off</a>
+<a class="b" href="mobile.html?nointro&noham">2 · no hamster</a>
+<a class="b" href="mobile.html?nointro&noanim">3 · no symbol animations</a>
+<a class="b" href="mobile.html?nointro&nomusic">4 · no music</a>
+<a class="b" href="mobile.html?nointro&nofx">5 · no CSS effects</a>
+<a class="b" href="mobile.html?nointro&mem">6 · full game</a>
+<button onclick="localStorage.clear();location.reload()" style="background:#555">clear results</button>
+<div id="log"></div>
+<script>
+const F = [["anim-A-idle.webp",121922,[1280,768]],["anim-A-reaptocoin.webp",148296,[1440,720]],["anim-A-win.webp",138218,[1440,720]],["anim-BANDANA-idle.webp",238430,[1280,768]],["anim-BANDANA-win.webp",281846,[1440,864]],["anim-BLADE-idle.webp",131676,[1280,768]],["anim-BLADE-win.webp",201540,[1440,864]],["anim-BOTTLE-idle.webp",153802,[1280,768]],["anim-BOTTLE-win.webp",224172,[1440,864]],["anim-COIN-collect.webp",61702,[1440,432]],["anim-COIN-idle.webp",124168,[1280,768]],["anim-CROWN-anticipation.webp",174344,[1440,576]],["anim-CROWN-flyoff.webp",132664,[1440,432]],["anim-CROWN-idle.webp",222912,[1280,768]],["anim-CROWN-land.webp",91144,[1440,432]],["anim-CROWN-notchhit.webp",74576,[1440,432]],["anim-J-idle.webp",111106,[1280,768]],["anim-J-reaptocoin.webp",148966,[1440,720]],["anim-J-win.webp",142284,[1440,720]],["anim-K-idle.webp",116610,[1280,768]],["anim-K-reaptocoin.webp",154644,[1440,720]],["anim-K-win.webp",160000,[1440,720]],["anim-KEY-idle.webp",116942,[1280,768]],["anim-KEY-win.webp",201722,[1440,864]],["anim-Q-idle.webp",122234,[1280,768]],["anim-Q-reaptocoin.webp",151526,[1440,720]],["anim-Q-win.webp",151220,[1440,720]],["anim-RING-idle.webp",149922,[1280,768]],["anim-RING-win.webp",193522,[1440,864]],["anim-STUD-idle.webp",108948,[1280,768]],["anim-STUD-win.webp",176014,[1440,864]],["anim-W-idle.webp",226042,[1280,768]],["anim-W-win.webp",278832,[1440,1008]],["bg-landscape-fs.webp",16966,[960,536]],["bg-landscape.webp",21912,[960,536]],["bg-portrait-fs.webp",14460,[540,960]],["bg-portrait.webp",20782,[540,960]],["croc-still.webp",9468,[232,311]],["frame-ov-l.webp",16160,[960,536]],["frame-ov-p.webp",11134,[540,960]],["ham-02.bin",1072260,null],["ham-03.bin",1912874,null],["ham-04.bin",1031288,null],["ham-05.bin",1057548,null],["ham-06.bin",1058214,null],["ham-07.bin",1103258,null],["ham-08.bin",951878,null],["ham-09.bin",1040784,null],["ham-still.webp",40536,[464,622]],["logo.webp",47258,[760,301]],["roboto.woff2",62828,null],["splash-bigwin-l.webp",69160,[960,536]],["splash-bigwin-p.webp",71586,[540,960]],["splash-epicwin-l.webp",105780,[960,536]],["splash-epicwin-p.webp",98258,[540,960]],["splash-fs-congrats-l.webp",13198,[454,193]],["splash-fs-congrats-p.webp",17822,[540,273]],["splash-fs-count-l.webp",19356,[342,223]],["splash-fs-count-p.webp",28002,[455,302]],["splash-fs-frame-l.webp",80672,[960,536]],["splash-fs-frame-p.webp",75848,[540,960]],["splash-intro-l.webp",49404,[960,536]],["splash-intro-p.webp",46098,[540,960]],["splash-megawin-l.webp",83246,[960,536]],["splash-megawin-p.webp",79094,[540,960]],["splash-tw-frame-l.webp",74618,[960,536]],["splash-tw-frame-p.webp",78524,[540,960]],["splash-tw-title-l.webp",14924,[568,193]],["splash-tw-title-p.webp",14692,[540,208]],["sym-A.webp",9814,[320,320]],["sym-BANDANA.webp",25318,[320,320]],["sym-BLADE.webp",9728,[320,320]],["sym-BOTTLE.webp",14186,[320,320]],["sym-COIN.webp",12596,[320,320]],["sym-CROWN.webp",24340,[320,320]],["sym-J.webp",9658,[320,320]],["sym-K.webp",9274,[320,320]],["sym-KEY.webp",9952,[320,320]],["sym-Q.webp",9922,[320,320]],["sym-RING.webp",17864,[320,320]],["sym-STUD.webp",9966,[320,320]],["sym-W.webp",26576,[320,320]],["sym-XW.webp",17104,[320,320]],["theme.mp3",939615,null],["wheel-skull.webp",6048,[118,220]],["wheel.webp",40812,[420,508]]];
+const LOG = document.getElementById('log');
+const P = (() => { try { return JSON.parse(localStorage.getItem('rhwt') || '[]'); } catch (e) { return []; } })();
+{ const pv = document.getElementById('prev'), m = localStorage.getItem('rhw_m_last'), me = localStorage.getItem('rhw_m_err');
+  pv.textContent = 'Last test run: ' + (P.length ? P.slice(-4).join('\n') : '(none)') + '\nLast game record: ' + (m || '(none)') + (me ? '\nLast game error: ' + me : '') +
+    '\nDevice: ' + navigator.userAgent.replace(/^Mozilla\/5.0 /, '') + ' dpr ' + devicePixelRatio + ' screen ' + screen.width + 'x' + screen.height; }
+function log(t) { LOG.textContent = t + '\n' + LOG.textContent; P.push(new Date().toTimeString().slice(0, 8) + ' ' + t); while (P.length > 40) P.shift(); try { localStorage.setItem('rhwt', JSON.stringify(P)); } catch (e) {} }
+window.onerror = (m) => log('ERROR ' + m); window.onunhandledrejection = (e) => log('REJECT ' + (e.reason && e.reason.message || e.reason));
+const KEEP = []; const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const imgs = F.filter((f) => f[2]), bins = F.filter((f) => /\.bin$/.test(f[0]));
+async function run(s) {
+  log('START ' + s.toUpperCase());
+  try {
+    if (s === 'a') log('A ok: page + CSP alive');
+    if (s === 'b' || s === 'c') {
+      let mb = 0, i = 0;
+      for (const f of imgs) {
+        i++; log(s.toUpperCase() + ' ' + i + '/' + imgs.length + ' ' + f[0] + ' ' + f[2].join('x') + ' (' + Math.round(f[1] / 1024) + ' KB)');
+        const im = new Image(); im.src = 'm/' + f[0];
+        if (s === 'c') { await im.decode(); KEEP.push(im); mb += f[2][0] * f[2][1] * 4 / 1e6; if (window.createImageBitmap && i % 10 === 0) { const bm = await createImageBitmap(im); bm.close(); } }
+        else await new Promise((r, j) => { im.onload = r; im.onerror = () => j(new Error('load failed ' + f[0])); });
+        await wait(30);
+      }
+      log(s.toUpperCase() + ' ok' + (s === 'c' ? ', ~' + Math.round(mb) + ' MB decoded and held' : ''));
+    }
+    if (s === 'd') {
+      const cv = document.createElement('canvas'); cv.width = 847; cv.height = 815; cv.style.width = '100%'; document.body.appendChild(cv);
+      const g = cv.getContext('2d'); g.imageSmoothingQuality = 'high'; log('D canvas 847x815 ok');
+      for (const f of bins) {
+        log('D fetch ' + f[0] + ' ' + Math.round(f[1] / 1024) + ' KB');
+        const buf = await (await fetch('m/' + f[0])).arrayBuffer(), dv = new DataView(buf), n = dv.getUint32(12, true);
+        let o = 16 + 4 * n; const parts = []; for (let j = 0; j < n; j++) { const l = dv.getUint32(16 + 4 * j, true); parts.push(new Uint8Array(buf, o, l)); o += l; }
+        log('D ' + f[0] + ': ' + n + ' frames, decoding');
+        for (let j = 0; j < n; j++) { const bm = await createImageBitmap(new Blob([parts[j]], { type: 'image/webp' })); g.clearRect(0, 0, cv.width, cv.height); g.drawImage(bm, 0, 0); if (j === 0) log('D frame ' + bm.width + 'x' + bm.height); bm.close(); }
+        log('D ' + f[0] + ' ok');
+      }
+      log('D ok');
+    }
+    if (s === 'e') { const a = new Audio('m/theme.mp3'); a.loop = true; await a.play(); log('E ok: music playing'); setTimeout(() => { a.pause(); log('E stopped'); }, 4000); }
+    if (s === 'f') { const fr = document.createElement('iframe'); fr.src = 'mobile.html?nointro&mem'; document.body.appendChild(fr); fr.onload = () => log('F frame loaded (watch it 20 s)'); setTimeout(() => log('F still alive after 20 s'), 20000); }
+  } catch (e) { log('FAIL ' + s.toUpperCase() + ': ' + (e && e.message || e)); }
+}
+</script></body></html>
