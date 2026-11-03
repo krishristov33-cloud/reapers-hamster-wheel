@@ -21,8 +21,9 @@ def compose(name, keep, size, sc, opaque=False, dy=0):
     W, H = size; cv = Image.new('RGBA', size, (0, 0, 0, 255 if opaque else 0))
     for l in J(name)['layers']:
         if not keep(l): continue
-        im = Image.open(l['src']).convert('RGBA').resize((max(1, round(l['qw'] * sc)), max(1, round(l['qh'] * sc))), Image.LANCZOS)
-        lay = Image.new('RGBA', size, (0, 0, 0, 0)); lay.paste(im, (round(l['qx'] * sc), round(l['qy'] * sc + (dy if REEL(l) else 0))))
+        e = 6 if l['name'] == 'Reel_Back' else 0                     # t114u: Reel_Back grown 6 px a side (no gap at the frame)
+        im = Image.open(l['src']).convert('RGBA').resize((max(1, round(l['qw'] * sc) + 2 * e), max(1, round(l['qh'] * sc) + 2 * e)), Image.LANCZOS)
+        lay = Image.new('RGBA', size, (0, 0, 0, 0)); lay.paste(im, (round(l['qx'] * sc) - e, round(l['qy'] * sc + (dy if REEL(l) else 0)) - e))
         cv = blend(cv, lay, l.get('blend', 'normal'), l.get('opacity', 1))
     return cv
 def save(im, n, q=80, rgb=False):
@@ -72,7 +73,8 @@ for g, n in SYM.items():
     im = (royal(g).resize((round(royal(g).size[0] * f), round(royal(g).size[1] * f)), Image.LANCZOS) if g in 'JQKA' else
           Image.open(l['src']).convert('RGBA').resize((round(l['qw'] * f), round(l['qh'] * f)), Image.LANCZOS))
     c = Image.new('RGBA', (400, 400), (0, 0, 0, 0)); c.alpha_composite(im, ((400 - im.size[0]) // 2, (400 - im.size[1]) // 2)); save(c, f'sym-{g}.webp', 88)
+    os.makedirs(OUT + '/psd_sym', exist_ok=True); c.save(f'{OUT}/psd_sym/sym-{g}.webp', 'WEBP', quality=90)
 co = Image.open(ROOT + '/elements/fx_skullCoin_1.png').convert('RGBA'); co.thumbnail((300, 300), Image.LANCZOS)
-c = Image.new('RGBA', (400, 400)); c.alpha_composite(co, ((400 - co.size[0]) // 2, (400 - co.size[1]) // 2)); save(c, 'sym-COIN.webp', 88)
+c = Image.new('RGBA', (400, 400)); c.alpha_composite(co, ((400 - co.size[0]) // 2, (400 - co.size[1]) // 2)); save(c, 'sym-COIN.webp', 88); c.save(f'{OUT}/psd_sym/sym-COIN.webp', 'WEBP', quality=90)
 out['symK'] = SYM_K
 json.dump(out, open(f'{OUT}/psd_fit.json', 'w'), indent=1); print(json.dumps(out))

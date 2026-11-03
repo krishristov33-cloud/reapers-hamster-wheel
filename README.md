@@ -57,3 +57,11 @@ The source lives on the shared box at `/workspace/rhw/` (`tools/make_assets.py`,
 - **Royals:** J/Q/K/A stills come from Aiko's fixed symbols_split parts (boards). The re-exported animations already include the boards.
 - **Symbol animations:** full 30 fps with no decimation (180 px cells). The frame is computed from performance.now() elapsed time.
 - **Rebuild order:** make_assets -> psd_fit -> pack_anims -> pack_hamster -> patch -> psd_patch -> anim_patch -> fix3_patch -> build
+
+## Update: fix pass 4 (t114u)
+- **Symbol idle loops:** every resting symbol loops its idle (160 px, 30 fps, random phase). Wins, scatter land and reaps hand back to the idle when they finish.
+- **Alignment:** every symbol's anims use one exact affine fit from its idle frame 0 to the PSD still. The reel still is now that same frame 0, so there's no pop when an anim starts (checked: ≤1 px at 180 px).
+- **REAP SPINS:** a collected coin leaves a faint skull and a ghost "xN" until the next spin. After the total-win splash the base game gets a fresh full board.
+- **Portrait HUD:** no BET button; i bottom-left, ≡ bottom-right.
+- **Landscape:** reels/frame at 91 %. All buttons and readouts sit in one bottom line; SPIN stays bottom right.
+- **Reel_Back:** grown 6 px a side.
