@@ -49,3 +49,11 @@ The source lives on the shared box at `/workspace/rhw/` (`tools/make_assets.py`,
 - **Music.** Kris's `music/reapers_hamster_wheel.mp3` is re-encoded with ffmpeg (trim silence, 96 kbps mono) into `assets/theme.mp3`. It is the looping BGM, starts after the first tap, and the HUD ♪ toggle controls it.
 - **Rebuild order:** `make_assets.py` -> `psd_fit.py` -> `pack_anims.py` -> `patch.py` -> `psd_patch.py` -> `anim_patch.py` -> `build.py`
 - **QA hook:** `window.RHW_QA` (fsSplash / winSplash / fsTotalSplash / fsLook). `qa_cmp.py` uses it for the screen-vs-PSD contact sheet.
+
+## Update: fix pass 3 (t111u/t112u)
+- **Portrait:** the reels moved up 180 px together with the frame and Reel_Back. The hamster is 15% smaller, sits behind Reel_Back, and is centred on its visible body (alpha bounding box). The play controls are a centred cluster under the reels.
+- **Landscape:** the play cluster is at the bottom right. The money panels moved to the bottom left, off the frame's beam and lanterns. The Levee Jaw footer line is gone.
+- **Hamster:** the default idle is code-driven (breathing, squash, bob and a slight tilt on the still, anchored at the feet). Every 15 s it plays one of Animoto's clips 02-09 once, in order. `tools/pack_hamster.py` packs them at 0.5 scale and 24 fps. The lj_dropin idle bin is no longer used.
+- **Royals:** J/Q/K/A stills come from Aiko's fixed symbols_split parts (boards). The re-exported animations already include the boards.
+- **Symbol animations:** full 30 fps with no decimation (180 px cells). The frame is computed from performance.now() elapsed time.
+- **Rebuild order:** make_assets -> psd_fit -> pack_anims -> pack_hamster -> patch -> psd_patch -> anim_patch -> fix3_patch -> build

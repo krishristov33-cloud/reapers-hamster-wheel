@@ -7,7 +7,7 @@ from concurrent.futures import ProcessPoolExecutor
 from PIL import Image
 SRC = '/workspace/aiko/projects/ReapersHamsterWheel/animations/symbols'
 OUT = '/workspace/rhw/assets'
-PX, COLS, Q = 200, 8, 78
+PX, COLS, Q = 180, 10, 76          # t111u: full 30 fps (no decimation), 180 px cells
 MAP = {'J': 'J', 'Q': 'Q', 'K': 'K', 'A': 'A', 'KEY': 'Cross', 'STUD': 'Potion', 'BANDANA': 'Spellbook', 'RING': 'Lantern',
        'BLADE': 'CrocSkull', 'BOTTLE': 'Scythe', 'W': 'WILD', 'CROWN': 'SCATTER', 'COIN': 'SkullCoin'}
 JOBS = [(g, 'win') for g in MAP if g not in ('CROWN', 'COIN')] + [(g, 'reap_to_coin') for g in 'JQKA'] + \
@@ -28,7 +28,7 @@ def job(ga):
     base = sorted(glob.glob(f'{SRC}/{MAP[g]}/png/{"idle" if an != "reap_to_coin" else an}/*.png'))[0]
     s, ox, oy = fitxf(g, base)
     k = PX / 400
-    pick = fr[::2] if an in LOOP else (fr[::2] if (len(fr) - 1) % 2 == 0 else fr[::2] + [fr[-1]])
+    pick = fr                                   # every source frame (30 fps)
     n = len(pick); rows = (n + COLS - 1) // COLS
     at = Image.new('RGBA', (COLS * PX, rows * PX), (0, 0, 0, 0))
     for i, f in enumerate(pick):
@@ -38,7 +38,7 @@ def job(ga):
             at.paste(Image.alpha_composite(Image.new('RGBA', (PX, PX)), _crop(im, ox * k, oy * k)), ((i % COLS) * PX, (i // COLS) * PX))
     name = f'anim-{g}-{an.replace("_", "")}.webp'
     at.save(f'{OUT}/{name}', 'WEBP', quality=Q, method=4)
-    return f'{g}:{an}', {'f': name, 'n': n, 'c': COLS, 'loop': an in LOOP, 'kb': os.path.getsize(f'{OUT}/{name}') // 1024, 's': round(s, 3)}
+    return f'{g}:{an}', {'f': name, 'n': n, 'c': COLS, 'loop': an in LOOP, 'fps': 30, 'kb': os.path.getsize(f'{OUT}/{name}') // 1024, 's': round(s, 3)}
 
 def _crop(im, ox, oy):
     c = Image.new('RGBA', (PX, PX)); c.alpha_composite(im, (0, 0), (round(-ox), round(-oy))) if True else None

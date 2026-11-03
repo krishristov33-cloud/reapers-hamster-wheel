@@ -120,7 +120,7 @@ rep("// intro splash: the whole screen", r"""async function reapCoinsAnim(st, L)
   await SA.wait(900);
 }
 // QA hook (headless screen compare): the splash screens + FS look
-window.RHW_QA = { fsSplash, winSplash, fsTotalSplash, fsLook, introSplash };
+window.RHW_QA = { fsSplash, winSplash, fsTotalSplash, fsLook, introSplash, SA, SA_META };
 // intro splash: the whole screen""")
 open(P, 'w', encoding='utf-8').write(s)
 print('anim ok', len(s))
