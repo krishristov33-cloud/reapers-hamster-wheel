@@ -33,3 +33,19 @@ The source lives on the shared box at `/workspace/rhw/` (`tools/make_assets.py`,
 - I removed the Levee Jaw UI: the jackpot bars, the tournament button, Buy Bonus, the UI sheet, the spin sprites, the START/COLLECT plates and the footer bar art.
 - I replaced it with a minimal CSS HUD in the toxic style: BALANCE/BET/WIN panels, a glowing SPIN button that turns into a STOP square, AUTO/TURBO/BET/menu/info/music/FX buttons, and START/COLLECT pills.
 - LAY now points to work/p2/layouts. In portrait the reels are lower and wider, and the hamster, wheel and HUD have been moved to fit. Win amounts have a glow halo because the boards are gone. The Potion sprite is now Sym_Potion_v2.
+
+
+## Update: PSD fit, symbol animations, music (t107u–t109u)
+- **Layout from Aiko's PSDs.** `work/p2/layouts/*.json` holds the PSD layer records. `tools/psd_fit.py` builds four pieces from them:
+  - the backgrounds (BG + Reel_Back + lantern glow, plus the FS purple grade)
+  - a full-stage frame overlay above the reels (dividers + frame + lanterns)
+  - the symbols at their native PSD size
+  - `assets/psd_fit.json`, which holds the reel grid, logo, wheel and hamster boxes
+  `tools/psd_patch.py` applies these numbers: the reel grid is Reel_Back in landscape, and portrait uses board scale 1.075. In landscape the wheel sits right of the reels and the SPIN cluster is top right.
+- **Symbol animations v1 (Animoto).** `tools/pack_anims.py` packs the PNG sequences into WebP atlases (200 px, 15 fps), re-fitted onto the sprite canvas. `tools/anim_patch.py` wires them:
+  - win one-shots on winning cells
+  - SCATTER: land, an anticipation loop, a flyoff loop while flying to the wheel, and notch_hit at the wheel
+  - REAP SPINS: reap_to_coin, then the SkullCoin idle loop with the xN label drawn by code, then collect
+- **Music.** Kris's `music/reapers_hamster_wheel.mp3` is re-encoded with ffmpeg (trim silence, 96 kbps mono) into `assets/theme.mp3`. It is the looping BGM, starts after the first tap, and the HUD ♪ toggle controls it.
+- **Rebuild order:** `make_assets.py` -> `psd_fit.py` -> `pack_anims.py` -> `patch.py` -> `psd_patch.py` -> `anim_patch.py` -> `build.py`
+- **QA hook:** `window.RHW_QA` (fsSplash / winSplash / fsTotalSplash / fsLook). `qa_cmp.py` uses it for the screen-vs-PSD contact sheet.

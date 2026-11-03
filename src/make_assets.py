@@ -137,7 +137,9 @@ print('croc-idle.bin', TW, TH, os.path.getsize(OUT + '/croc-idle.bin') // 1024, 
 json.dump({'hamster': [TW, TH], 'boxes': BOX}, open(OUT + '/meta.json', 'w'))
 
 # 8) kept from LEVEE JAW (UI chrome, font, music, spin button pieces, START plate)
-for f in ['roboto.woff2', 'theme.mp3']:            # UI2: no LEVEE JAW UI sheet / spin / START plates any more
+for f in ['roboto.woff2']:   # theme.mp3 = Kris's track (t109u, music/ -> ffmpeg, see README)
+    pass
+for f in ['roboto.woff2']:            # UI2: no LEVEE JAW UI sheet / spin / START plates any more
     shutil.copy(f'{LJ}/{f}', f'{OUT}/{f}')
 
 # Animoto game pack v1 drop-in (overrides step 7)

@@ -24,7 +24,7 @@ eng = open('/workspace/rhw/src/engine.js', encoding='utf-8').read()
 rep_re(r'<script>/\* =+\r?\n   LEVEE JAW — math engine.*?</script>', '<script>' + eng + '</script>')
 
 # ---------------------------------------------------------------- layout (board px, 1920x1072 board)
-WX0, WX1, WY0, WY1 = 494, 1422, 115, 825          # reel window: 5 x 185.6, 4 x 177.5
+WX0, WX1, WY0, WY1 = 490.5, 1429.5, 240.7, 980.2   # PSD pass 2 (t108u): Reel_Back = the 5x4 cell grid (stage px)
 cw, ch = (WX1 - WX0) / 5, (WY1 - WY0) / 4
 cx = [[round(WX0 + i * cw, 1), round(WX0 + (i + 1) * cw, 1)] for i in range(5)]
 cy = [[round(WY0 + i * ch, 1), round(WY0 + (i + 1) * ch, 1)] for i in range(4)]
