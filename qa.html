@@ -10,6 +10,8 @@ button:hover{background:#1d3b1d;box-shadow:0 0 8px #7CFF3A55}
 iframe{border:1px solid #2a4a2a;background:#000}
 </style></head><body>
 <div id="side"><h1>Reaper's Hamster Wheel QA</h1>
+<h2>Build</h2>
+<button id="bv" onclick="tog()">Build: desktop.html (switch to mobile)</button>
 <h2>View</h2>
 <button onclick="size(1280,720)">Landscape 1280x720</button>
 <button onclick="size(1920,1080)">Landscape 1920x1080</button>
@@ -31,7 +33,8 @@ const g=document.getElementById('g'),L=document.getElementById('log');let W=1280
 function log(s){L.textContent=new Date().toLocaleTimeString()+' '+s+'\n'+L.textContent}
 function fit(){const st=document.getElementById('stage'),k=Math.min(1,(st.clientWidth-20)/W,(st.clientHeight-20)/H);g.style.width=W+'px';g.style.height=H+'px';g.style.transform='scale('+k+')'}
 function size(w,h){W=w;H=h;fit();log('view '+w+'x'+h)}
-function load(p){q=p;g.src='index.html'+p;log('load '+(p||'(intro)'))}
+let B='desktop.html';function tog(){B=B==='desktop.html'?'mobile.html':'desktop.html';document.getElementById('bv').textContent='Build: '+B+' (switch to '+(B==='desktop.html'?'mobile':'desktop')+')';load(q)}
+function load(p){q=p;g.src=B+p;log('load '+B+(p||' (intro)'))}
 function dbg(f,a){try{const d=g.contentWindow.SP_DEBUG;if(!d||!d[f])return log('SP_DEBUG.'+f+' not available yet');const r=a===undefined?d[f]():d[f](a);log(f+(a!==undefined?'('+JSON.stringify(a)+')':'')+' ok'+(r!==undefined?' -> '+r:''))}catch(e){log(f+' error: '+e.message)}}
 addEventListener('resize',fit);size(1280,720);load('?nointro');
 </script></body></html>
